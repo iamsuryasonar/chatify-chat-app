@@ -1,4 +1,4 @@
-import { getAuth, signInWithPopup, GithubAuthProvider } from "firebase/auth";
+import { getAuth, signInWithPopup, GithubAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
 
 export function githubSignInPopup() {
     return new Promise(function (resolve, reject) {
@@ -30,11 +30,49 @@ export function githubSignInPopup() {
     })
 }
 
+export function emailPasswordSignUp(email, password) {
+    return new Promise(function (resolve, reject) {
+        const auth = getAuth();
 
-export function signOut() {
-    firebase.auth().signOut().then(() => {
-        // Sign-out successful.
-    }).catch((error) => {
-        // An error happened.
-    });
+        createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                resolve(user)
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                reject(error)
+            });
+    })
+}
+
+export function emailPasswordSignIn(email, password) {
+    return new Promise(function (resolve, reject) {
+        const auth = getAuth();
+
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                resolve(user)
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                reject(error)
+            });
+    })
+}
+
+
+export function logOut() {
+    return new Promise(function (resolve, reject) {
+        const auth = getAuth();
+
+        signOut(auth).then(() => {
+            resolve('Log out successfully')
+        }).catch((error) => {
+            reject(error)
+        });
+    })
 }

@@ -1,6 +1,6 @@
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBG_7BQwWBoFW_vGydyI-8nWSMg-V2f-3E,
+    apiKey: "AIzaSyBG_7BQwWBoFW_vGydyI-8nWSMg-V2f-3E",
     authDomain: "chatify-app11.firebaseapp.com",
     databaseURL: "https://chatify-app11-default-rtdb.firebaseio.com",
     projectId: "chatify-app11",

@@ -1,23 +1,27 @@
-import './App.css'
-import { githubSignInPopup } from '../services/auth.services';
-import { getAuth } from "firebase/auth";
-
-import { useEffect } from 'react';
+import Home from './pages/Home';
+import LogIn from './pages/LogIn';
+import { Routes, Route } from 'react-router-dom';
+import Register from './pages/Register';
+import PublicRoute from './components/guards/PublicRoute';
+import PrivateRoute from './components/guards/PrivateRoute';
+import Hero from './pages/Hero';
+import Layout from './components/Layout';
 
 function App() {
-  async function signInHandler() {
-    let data = await githubSignInPopup();
-  }
-
-  useEffect(() => {
-    const auth = getAuth();
-    console.log(auth.currentUser)
-  })
 
   return (
-    <div>
-      <button onClick={signInHandler} className='px-4 py-1 bg-black text-white shadow-md rounded-md'>Sign in with github</button>
-    </div>
+    <>
+      <Routes>
+        <Route element={
+          <Layout />
+        }>
+          <Route path="/" element={<PublicRoute><Hero /></PublicRoute>}></Route>
+          <Route path="/sign-up" element={<PublicRoute><Register /></PublicRoute>}></Route>
+          <Route path="/sign-in" element={<PublicRoute><LogIn /></PublicRoute>}></Route>
+          <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>}></Route>
+        </Route>
+      </Routes>
+    </>
   )
 }
 
