@@ -1,19 +1,19 @@
 import { useState } from 'react';
-import { emailPasswordSignIn } from '../services/auth.services';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import firebaseService from '../services/firebase.services';
 
 function LogIn() {
     const navigate = useNavigate();
+
     const [input, setInput] = useState({
         email: 'test@gmail.com',
         password: '11111111'
     });
 
     async function signInHandler() {
-        await emailPasswordSignIn(input.email, input.password).then((user) => {
-            navigate('/home')
-        });
+        await firebaseService.emailSignIn(input.email, input.password);
+        navigate('/home');
     }
 
     const handleChange = (e) => {

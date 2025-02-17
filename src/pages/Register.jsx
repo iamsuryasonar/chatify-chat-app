@@ -1,27 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { doc, setDoc } from "firebase/firestore";
-import { emailPasswordSignUp } from '../services/auth.services';
-import { db } from '../utils/firebase';
 import { Link } from 'react-router-dom';
+import firebaseService from '../services/firebase.services';
 
 function Register() {
     const navigate = useNavigate();
     const [input, setInput] = useState('');
 
-    async function writeUserData(userId, email) {
-
-        await setDoc(doc(db, "users", userId), {
-            email: email,
-        });
-    }
-
     async function signUpHandler() {
-        await emailPasswordSignUp(input.email, input.password).then((user) => {
-            const { uid, email } = user;
-            writeUserData(uid, email);
-            navigate('/home')
-        });
+        await firebaseService.emailSignUp(input.email, input.password);
+        navigate('/home')
     }
 
     const handleChange = (e) => {

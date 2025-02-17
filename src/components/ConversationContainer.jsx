@@ -1,72 +1,66 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { AuthContext } from '../provider/AuthProvider';
-import { IoMdSearch } from 'react-icons/io';
-import { getFirestore, collection, query, orderBy, startAt, endAt, getDocs, doc, setDoc, getDoc, addDoc, serverTimestamp } from "firebase/firestore";
+import { IoMdClose, IoMdSearch } from 'react-icons/io';
+import firebaseService from '../services/firebase.services';
+import { useConversations } from '../hooks/useConversation';
+import { useError } from '../hooks/useError';
+import { LoadingContext } from '../provider/loadingProvider';
+import useLoading from '../hooks/useLoading';
 
-function ConversationContainer({ setOpenChatWith }) {
-    const [conversations, setConversations] = useState();
+function ConversationContainer({ currentChat, setCurrentChat, showTranslate, }) {
     const [searchEmail, setSearchEmail] = useState('');
     const [searchedEmails, setSearchedEmails] = useState(null);
+    const { startLoading, stopLoading } = useContext(LoadingContext);
+    // const { startLoading, stopLoading } = useLoading();
+
+    const { setError } = useError();
 
     const { currentUser } = useContext(AuthContext);
-    const db = getFirestore();
 
-    async function getConversation(currentUser) {
-        if (!currentUser.uid) return;
-
-        const querySnapshot = await getDocs(collection(db, "users", currentUser.uid, "conversations"));
-        let data = [];
-
-        querySnapshot.forEach((doc) => {
-            data.push(doc.data());
-        });
-
-        setConversations(data);
-    }
+    const { conversations } = useConversations();
 
     const searchUserByEmail = async (prefix) => {
         try {
-            const q = query(
-                collection(db, "users"),
-                orderBy("email"),
-                startAt(prefix),
-                endAt(prefix + "\uf8ff")
-            );
-
-            const querySnapshot = await getDocs(q);
-            if (!querySnapshot.empty) {
-                let result = [];
-                querySnapshot.forEach((doc) => {
-                    result.push({ ...doc.data(), id: doc.id });
-                });
-                setSearchedEmails(result);
-            } else {
-                console.log("No similar emails found.");
-            }
-        } catch (error) {
-            console.error("Error searching similar emails: ", error);
+            startLoading()
+            let data = await firebaseService.searchUserByEmail(prefix);
+            setSearchedEmails(data);
+        } catch (err) {
+            setError('Error occurred! please try again')
+        } finally {
+            stopLoading()
         }
     };
 
     function handleSearch() {
+        if (searchEmail.length < 4) return;
         searchUserByEmail(searchEmail);
     }
 
-    useEffect(() => {
-        getConversation(currentUser);
-    }, [currentUser.uid])
-
-    return <div className="max-w-[170px] sm:max-w-[200px] md:max-w-[240px] lg:max-w-[300px] w-full h-full bg-slate-950 flex flex-col gap-2 overflow-auto text-white">
+    return <div className="md:max-w-[300px] lg:max-w-[300px] h-full bg-slate-950 flex flex-col gap-2 overflow-auto text-white">
         <div className="flex flex-col items-start">
             <div className='relative m-2'>
-                <input type="text" placeholder='Search' className='w-full pl-2 py-1 border-[1px] border-state-300 pr-[30px] bg-transparent' onChange={(e) => setSearchEmail(e.target.value)} />
-                {/* //todo: debounce search call and replace search icon button with clear icon button */}
-                <IoMdSearch onClick={handleSearch} size={'30px'} className='cursor-pointer aspect-square p-1 absolute right-[4px] top-1/2 bottom-1/2 -translate-y-1/2 ' />
+                <input type="text" placeholder='Search' className='w-full pl-2 py-1 border-[1px] border-state-300 pr-[30px] bg-transparent'
+                    value={searchEmail}
+                    onChange={(e) => setSearchEmail(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleSearch();
+                    }}
+                />
+                <div className='absolute right-[4px] top-1/2 bottom-1/2 -translate-y-1/2 flex gap-[1px] items-center'>
+                    {
+                        searchEmail && <IoMdClose onClick={() => {
+                            setSearchEmail('');
+                            setSearchedEmails(null)
+                        }} size={'26px'} className='cursor-pointer aspect-square p-1 hover:bg-slate-700 rounded-full' />
+                    }
+                    {/* //todo: debounce search call and replace search icon button with clear icon button */}
+                    <IoMdSearch onClick={handleSearch} size={'26px'} className='cursor-pointer aspect-square p-1 hover:bg-slate-700 rounded-full' />
+                </div>
             </div>
             {
                 searchedEmails && searchedEmails.map((conversation) => {
                     return <div className='w-full' key={conversation.id}>
-                        <button className='w-full text-start p-2 bg-slate-900 hover:bg-slate-700' onClick={() => setOpenChatWith(conversation)} >{conversation.email}</button>
+                        <button className='w-full text-start p-2 bg-slate-900 hover:bg-slate-700' onClick={() => setCurrentChat(conversation)} >{conversation.email}</button>
                     </div>
                 })
             }
@@ -75,7 +69,7 @@ function ConversationContainer({ setOpenChatWith }) {
             }
             {
                 conversations && conversations.map((conversation) => {
-                    return <button className='w-full p-2 text-start bg-slate-900 hover:bg-slate-700' onClick={() => setOpenChatWith(conversation.userInfo)} key={conversation.userInfo.id}>{conversation.userInfo.email}</button>
+                    return <button className={`w-full p-2 text-start ${currentChat?.id === conversation.userInfo.id ? 'bg-green-800' : 'bg-slate-900 hover:bg-slate-700'}`} onClick={() => setCurrentChat(conversation.userInfo)} key={conversation.userInfo.id}>{conversation.userInfo.email}</button>
                 })
             }
         </div>
