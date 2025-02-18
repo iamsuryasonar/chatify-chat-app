@@ -1,16 +1,20 @@
-import { useState } from "react";
+import { createContext, useContext, useState } from "react";
 
-const useLoading = () => {
+export const LoadingContext = createContext(false);
+
+export const LoadingProvider = ({ children }) => {
     const [loading, setLoading] = useState(false);
 
     const startLoading = () => setLoading(true);
     const stopLoading = () => setLoading(false);
 
-    return {
-        loading,
-        startLoading,
-        stopLoading
-    };
+    return (
+        <LoadingContext.Provider value={{ loading, startLoading, stopLoading }}>
+            {children}
+        </LoadingContext.Provider>
+    );
 };
 
-export default useLoading;
+export const useLoading = () => {
+    return useContext(LoadingContext);
+};

@@ -4,14 +4,12 @@ import { IoMdClose, IoMdSearch } from 'react-icons/io';
 import firebaseService from '../services/firebase.services';
 import { useConversations } from '../hooks/useConversation';
 import { useError } from '../hooks/useError';
-import { LoadingContext } from '../provider/loadingProvider';
-import useLoading from '../hooks/useLoading';
+import { useLoading } from '../hooks/useLoading';
 
-function ConversationContainer({ currentChat, setCurrentChat, showTranslate, }) {
+function ConversationContainer({ user, setCurrentChat, showTranslate, }) {
     const [searchEmail, setSearchEmail] = useState('');
     const [searchedEmails, setSearchedEmails] = useState(null);
-    const { startLoading, stopLoading } = useContext(LoadingContext);
-    // const { startLoading, stopLoading } = useLoading();
+    const { startLoading, stopLoading } = useLoading();
 
     const { setError } = useError();
 
@@ -36,7 +34,7 @@ function ConversationContainer({ currentChat, setCurrentChat, showTranslate, }) 
         searchUserByEmail(searchEmail);
     }
 
-    return <div className="md:max-w-[300px] lg:max-w-[300px] h-full bg-slate-950 flex flex-col gap-2 overflow-auto text-white">
+    return <div className="w-full md:max-w-[300px] lg:max-w-[300px] h-full bg-slate-950 flex flex-col gap-2 overflow-auto text-white">
         <div className="flex flex-col items-start">
             <div className='relative m-2'>
                 <input type="text" placeholder='Search' className='w-full pl-2 py-1 border-[1px] border-state-300 pr-[30px] bg-transparent'
@@ -69,7 +67,7 @@ function ConversationContainer({ currentChat, setCurrentChat, showTranslate, }) 
             }
             {
                 conversations && conversations.map((conversation) => {
-                    return <button className={`w-full p-2 text-start ${currentChat?.id === conversation.userInfo.id ? 'bg-green-800' : 'bg-slate-900 hover:bg-slate-700'}`} onClick={() => setCurrentChat(conversation.userInfo)} key={conversation.userInfo.id}>{conversation.userInfo.email}</button>
+                    return <button className={`w-full p-2 text-start ${user?.id === conversation.userInfo.id ? 'bg-green-800' : 'bg-slate-900 hover:bg-slate-700'}`} onClick={() => setCurrentChat(conversation.userInfo)} key={conversation.userInfo.id}>{conversation.userInfo.email}</button>
                 })
             }
         </div>

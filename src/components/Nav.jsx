@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../provider/AuthProvider';
 import firebaseService from '../services/firebase.services';
 import LoadingBar from './LoadingBar';
-import { LoadingContext } from '../provider/loadingProvider';
+import { useLoading } from '../hooks/useLoading';
 
 function Nav() {
 
     const navigate = useNavigate();
-    const { loading, startLoading, stopLoading } = useContext(LoadingContext);
+    const { loading } = useLoading();
 
     const { currentUser } = useContext(AuthContext);
 

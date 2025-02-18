@@ -4,13 +4,13 @@ import { useEffect } from "react";
 import { AuthContext } from "../provider/AuthProvider";
 import { useConversations } from "./useConversation";
 import { useError } from "./useError";
-import { LoadingContext } from "../provider/loadingProvider";
+import { useLoading } from "./useLoading";
 
 export const useChats = () => {
     const [chats, setChats] = useState({});
     const { currentUser } = useContext(AuthContext);
     const { conversations } = useConversations();
-    const { startLoading, stopLoading } = useContext(LoadingContext);
+    const { startLoading, stopLoading } = useLoading();
 
     const { setError } = useError();
 

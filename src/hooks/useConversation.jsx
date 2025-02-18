@@ -2,12 +2,12 @@ import { useState, useEffect, useContext } from "react";
 import firebaseService from "../services/firebase.services";
 import { AuthContext } from '../provider/AuthProvider';
 import { useError } from "./useError";
-import { LoadingContext } from "../provider/loadingProvider";
+import { useLoading } from "./useLoading";
 
 export const useConversations = () => {
     const [conversations, setConversations] = useState(null);
     const { currentUser } = useContext(AuthContext);
-    const { startLoading, stopLoading } = useContext(LoadingContext);
+    const { startLoading, stopLoading } = useLoading();
     const { setError } = useError();
 
     useEffect(() => {

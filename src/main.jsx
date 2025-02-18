@@ -4,15 +4,18 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
 import './index.css'
 import { AuthProvider } from './provider/AuthProvider.jsx'
-import { LoadingProvider } from './provider/loadingProvider.jsx'
+import { LoadingProvider } from './hooks/useLoading.jsx'
+import { FullLayoutProvider } from './hooks/useFullLayOut';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <AuthProvider>
       <BrowserRouter>
-        <LoadingProvider>
-          <App />
-        </LoadingProvider>
+        <FullLayoutProvider>
+          <LoadingProvider>
+            <App />
+          </LoadingProvider>
+        </FullLayoutProvider>
       </BrowserRouter>
     </AuthProvider>
   </React.StrictMode>,
